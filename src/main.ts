@@ -26,12 +26,51 @@ else {
 
   app.use(cors());
   app.use(bodyParser.json());
-
-  app.get('/', (request: Request, response: Response ) => {
-    response.send('Hello World!');
+  app.post('/backbone', (request: Request, response: Response ) => {
+     
   });
 
   app.listen(3000, () => {
     console.log(`Server is running on port 3000 with worker ${process.pid}`);
   });
 }
+
+
+function handleRequest(request: Request, response: Response, backboneContext: BackboneContext  ) {
+
+    
+
+
+}
+
+function deriveApiContext(request: Request): ApiContext {
+
+  let apiContext: ApiContext = new ApiContext();
+  
+
+
+  return apiContext;
+}
+
+
+// import axios from 'axios';
+
+// interface MyRequestBody {
+//   knownProperty: string;
+//   unknownProperty: any;
+// }
+
+// app.post('/backbone', async (request: Request, response: Response ) => {
+//   const body: MyRequestBody = request.body;
+  
+//   // Process knownProperty
+//   console.log(body.knownProperty);
+
+//   // Send unknownProperty as the body of another POST request
+//   try {
+//     const res = await axios.post('http://example.com/endpoint', body.unknownProperty);
+//     console.log(res.data);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// });

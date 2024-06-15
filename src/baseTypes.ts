@@ -19,7 +19,4 @@ export class ApiContext {
    public requiredScope: String = "";
    public requiredProfile: String = "";
 
-   
-
-
 }
