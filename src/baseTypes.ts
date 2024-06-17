@@ -1,22 +1,37 @@
 export class BackboneContext { 
 
+   fmblEndPoint: String = "";
+
 
 
 }
 
-export class ApiContext {
 
-   public path : String = "";
-   public method : String = "";
-   public lobEndpoint: String = "";
-   public clientHeaders : Map<String, String> = new Map<String, String>();
-   public clientParams  : Map<String, String> = new Map<String, String>();
+export class APISetup {
+
+   apiName: String = "";
+
+   apiVersion: String = "";
+}
+
+export class WrappedRequest {
+
+   body: any;
+
+   params: RequestParams = new RequestParams();
+
+   stageVariables: Map<String, String> = new Map<String, String>();
+
+   context:Map<String,String> = new Map<String,String>();  
+
+}
+
+
+export class RequestParams {
    
-   public auditEnabled: boolean = false;
-   public ignoreAuditFailure : boolean = false;
-   public lobTokenRequired : boolean = false;
+   path: Map<String, String> = new Map<String, String>();
 
-   public requiredScope: String = "";
-   public requiredProfile: String = "";
+   querystring: Map<String, String> = new Map<String, String>();
 
+   header: Map<String, String> = new Map<String, String>();
 }
