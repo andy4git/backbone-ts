@@ -1,17 +1,20 @@
 # Use an official Node.js runtime as the base image
-FROM node:latest
+FROM registry.access.redhat.com/ubi8/nodejs-20:1-46.1717586532
+
+USER root
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY *.json ./
 
 # Install app dependencies
 RUN npm install
 
 # Copy the rest of the app source code to the working directory
-COPY . .
+COPY ./src ./src
+COPY ./dist ./dist
 
 # Build the TypeScript app
 RUN npm run build

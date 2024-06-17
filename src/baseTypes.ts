@@ -1,17 +1,14 @@
-export class BackboneContext { 
-
+export class BackboneSetting { 
    fmblEndPoint: String = "";
-
-
-
 }
 
 
 export class APISetup {
-
    apiName: String = "";
-
-   apiVersion: String = "";
+   requiredScope: String = "";
+   requiredProfile: String = "";
+   auditRequired : boolean = false;
+   ignoreAuditFailure : boolean = false;
 }
 
 export class WrappedRequest {
@@ -34,4 +31,18 @@ export class RequestParams {
    querystring: Map<String, String> = new Map<String, String>();
 
    header: Map<String, String> = new Map<String, String>();
+}
+
+
+export class BackboneContext {
+
+   apiSetup: APISetup ;
+   backboneSetting: BackboneSetting;
+   wrappedRequest: WrappedRequest ;
+
+   constructor(apiSetup: APISetup, backboneSetting: BackboneSetting, wrappedRequest: WrappedRequest) {
+      this.apiSetup = apiSetup;
+      this.backboneSetting = backboneSetting;
+      this.wrappedRequest = wrappedRequest;
+   }
 }

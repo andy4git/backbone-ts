@@ -1,10 +1,13 @@
-apiVersion: networking.k8s.io/v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
-  name: my-route
+  name: backbone
 spec:
+  host: backbone.apps.dev2.ecp.ehealthontario.ca
   to:
     kind: Service
-    name: my-service
-  port:
-    targetPort: 8080
+    name: backbone
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None    

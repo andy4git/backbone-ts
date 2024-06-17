@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-service
+  name: backbone
 spec:
   selector:
-    app: my-app
+    app: backbone
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
+      targetPort: 3000

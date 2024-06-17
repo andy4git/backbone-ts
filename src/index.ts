@@ -4,7 +4,7 @@ import express from 'express';
 import { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import { WrappedRequest, RequestParams, BackboneContext } from './baseTypes';
+import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISetup } from './baseTypes';
 
 
 
@@ -24,12 +24,12 @@ import { WrappedRequest, RequestParams, BackboneContext } from './baseTypes';
 
 
   const app = express();
-  const backboneContext : BackboneContext = deriveBackboneContext();
+  const backboneSetting : BackboneSetting = getBackBoneSetting();
 
   app.use(cors());
   app.use(bodyParser.json());
   app.post('/backbone', (request: Request, response: Response ) => {
-    handleRequest(request, response, backboneContext);
+    handleRequest(request, response, backboneSetting);
   });
 
   app.listen(3000, () => {
@@ -38,31 +38,31 @@ import { WrappedRequest, RequestParams, BackboneContext } from './baseTypes';
 
 //}
 
+function handleRequest(request: Request, response: Response, backboneSetting: BackboneSetting ) {
 
-function deriveBackboneContext(): BackboneContext {
-  const backboneContext: BackboneContext = new BackboneContext();
-  return backboneContext;
-}
-
-function handleRequest(request: Request, response: Response, backboneContext: BackboneContext  ) {
-
-  const wrappedRequest: WrappedRequest = request.body;
-
+  const backboneContext: BackboneContext = deriveBackboneContext(request, backboneSetting);
   response.type('application/json');
-  response.setHeader('Access-Control-Allow-Origin', '*');
   response.setHeader('Powered-By', 'NodeJS/Typescript');
-  response.status(200).send(wrappedRequest);
+  response.status(200).send(backboneContext.wrappedRequest);
 
 }
 
-function deriveApiContext(request: Request): WrappedRequest {
+function getBackBoneSetting(): BackboneSetting {
+  let backboneSetting: BackboneSetting = new BackboneSetting();
+  backboneSetting.fmblEndPoint = "https://fmbl.com";
+  return backboneSetting;
+}
 
+function deriveBackboneContext(request: Request, backboneSetting: BackboneSetting): BackboneContext {
+
+  let apiSetup : APISetup = new APISetup();
   let wrappedRequest: WrappedRequest = request.body;
-  
+  let backboneContext: BackboneContext = new BackboneContext(apiSetup, backboneSetting, wrappedRequest);
 
-
-  return wrappedRequest;
+  return backboneContext
 }
+
+
 
 
 // import axios from 'axios';
