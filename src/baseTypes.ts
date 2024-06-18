@@ -1,48 +1,65 @@
 export class BackboneSetting { 
-   fmblEndPoint: String = "";
+   public fmblEndPoint: String = "";
 }
 
-
 export class APISetup {
-   apiName: String = "";
-   requiredScope: String = "";
-   requiredProfile: String = "";
-   auditRequired : boolean = false;
-   ignoreAuditFailure : boolean = false;
+   public apiName: String = "";
+   public requiredScope: String = "";
+   public requiredProfile: String = "";
+   public auditRequired : boolean = false;
+   public ignoreAuditFailure : boolean = false;
 }
 
 export class WrappedRequest {
 
-   body: any;
+   public body: any;
 
-   params: RequestParams = new RequestParams();
+   public params: RequestParams = new RequestParams();
 
-   stageVariables: Map<String, String> = new Map<String, String>();
+   public stageVariables: Map<String, String> = new Map<String, String>();
 
-   context:Map<String,String> = new Map<String,String>();  
+   public context:Map<String,String> = new Map<String,String>();  
 
 }
 
 
 export class RequestParams {
    
-   path: Map<String, String> = new Map<String, String>();
+   public path: Map<String, String> = new Map<String, String>();
 
-   querystring: Map<String, String> = new Map<String, String>();
+   public querystring: Map<String, String> = new Map<String, String>();
 
-   header: Map<String, String> = new Map<String, String>();
+   public header: Map<String, String> = new Map<String, String>();
 }
 
 
 export class BackboneContext {
 
-   apiSetup: APISetup ;
-   backboneSetting: BackboneSetting;
-   wrappedRequest: WrappedRequest ;
+   public apiSetup: APISetup ;
+   public backboneSetting: BackboneSetting;
+   public wrappedRequest: WrappedRequest ;
+   public latencyRecords: LatencyRecord[]; 
 
    constructor(apiSetup: APISetup, backboneSetting: BackboneSetting, wrappedRequest: WrappedRequest) {
       this.apiSetup = apiSetup;
       this.backboneSetting = backboneSetting;
       this.wrappedRequest = wrappedRequest;
+      this.latencyRecords = [];
    }
+}
+
+export class LatencyRecord {
+   public start: number;
+   public latency: number;
+   public actionName: string;
+
+   constructor(start: number, latency: number, actionName: string) {
+      this.start = start;
+      this.latency = latency;
+      this.actionName = actionName;
+   }
+}
+
+export interface ILatency{
+   recordLatency(start: number, latency: number, action: String, BackboneContext: BackboneContext): void;
 }

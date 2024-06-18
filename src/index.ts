@@ -40,6 +40,9 @@ import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISet
 
 function handleRequest(request: Request, response: Response, backboneSetting: BackboneSetting ) {
 
+  logIncomingRequest(request);
+  
+
   const backboneContext: BackboneContext = deriveBackboneContext(request, backboneSetting);
   response.type('application/json');
   response.setHeader('Powered-By', 'NodeJS/Typescript');
@@ -62,7 +65,12 @@ function deriveBackboneContext(request: Request, backboneSetting: BackboneSettin
   return backboneContext
 }
 
-
+function logIncomingRequest(request: Request) {
+  console.log(`Incoming Request: ${request.method} ${request.url}`);
+  console.log(`Headers: ${JSON.stringify(request.headers)}`);
+  console.log(`Query: ${JSON.stringify(request.query)}`);
+  console.log(`Body: ${JSON.stringify(request.body)}`);
+}
 
 
 // import axios from 'axios';
