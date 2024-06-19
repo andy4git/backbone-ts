@@ -1,11 +1,13 @@
+import { AxiosResponse } from "axios";
+
 export class BackboneSetting { 
-   public fmblEndPoint: String = "";
+   public fmblEndPoint: string = "";
 }
 
 export class APISetup {
-   public apiName: String = "";
-   public requiredScope: String = "";
-   public requiredProfile: String = "";
+   public apiName: string = "";
+   public requiredScope: string = "";
+   public requiredProfile: string = "";
    public auditRequired : boolean = false;
    public ignoreAuditFailure : boolean = false;
 }
@@ -16,20 +18,20 @@ export class WrappedRequest {
 
    public params: RequestParams = new RequestParams();
 
-   public stageVariables: Map<String, String> = new Map<String, String>();
+   public stageVariables: Map<string, string> = new Map<string, string>();
 
-   public context:Map<String,String> = new Map<String,String>();  
+   public context:Map<string,string> = new Map<string,string>();  
 
 }
 
 
 export class RequestParams {
    
-   public path: Map<String, String> = new Map<String, String>();
+   public path: Map<string, string> = new Map<string, string>();
 
-   public querystring: Map<String, String> = new Map<String, String>();
+   public querystring: Map<string, string> = new Map<string, string>();
 
-   public header: Map<String, String> = new Map<String, String>();
+   public header: Map<string, string> = new Map<string, string>();
 }
 
 
@@ -39,6 +41,7 @@ export class BackboneContext {
    public backboneSetting: BackboneSetting;
    public wrappedRequest: WrappedRequest ;
    public latencyRecords: LatencyRecord[]; 
+   public lobResponse: AxiosResponse<any, any> | null = null;
 
    constructor(apiSetup: APISetup, backboneSetting: BackboneSetting, wrappedRequest: WrappedRequest) {
       this.apiSetup = apiSetup;
@@ -61,5 +64,9 @@ export class LatencyRecord {
 }
 
 export interface ILatency{
-   recordLatency(start: number, latency: number, action: String, BackboneContext: BackboneContext): void;
+   recordLatency(backboneContext: BackboneContext): void;
+}
+
+export interface IBackboneHandler {
+   process( backboneContext: BackboneContext ) : void;
 }

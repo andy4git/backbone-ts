@@ -1,11 +1,13 @@
 import cluster, { Worker } from 'cluster';
 import os from 'os';
 import express from 'express';
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISetup } from './baseTypes';
-
+import { handleDummyBackend } from './dummy';
+import { LobHandler } from './LobHandler';
+import { OAGError } from './errors';
 
 
 // if (cluster.isPrimary) {
@@ -31,6 +33,11 @@ import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISet
   app.post('/backbone', (request: Request, response: Response ) => {
     handleRequest(request, response, backboneSetting);
   });
+  
+  // Wildcard route to handle any other path with default logic
+  app.all('*', (request: Request, response: Response) => {
+     handleDummyBackend(request, response);
+  });
 
   app.listen(3000, () => {
     console.log(`Server is running on port 3000 with worker ${process.pid}`);
@@ -38,15 +45,34 @@ import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISet
 
 //}
 
-function handleRequest(request: Request, response: Response, backboneSetting: BackboneSetting ) {
+async function handleRequest(request: Request, response: Response, backboneSetting: BackboneSetting ) {
 
   logIncomingRequest(request);
   
-
   const backboneContext: BackboneContext = deriveBackboneContext(request, backboneSetting);
-  response.type('application/json');
-  response.setHeader('Powered-By', 'NodeJS/Typescript');
-  response.status(200).send(backboneContext.wrappedRequest);
+  
+  try {
+      const lobHandler = new LobHandler();
+      lobHandler.process(backboneContext);
+      sendBackResponse(response, backboneContext);
+  }
+  catch(error) {
+    console.log(`Error occurred while processing the request: ${error}`);
+    if( error instanceof OAGError ) {
+      let errorMsg = {
+        errorCode: error.errorCode,
+        message: error.message
+      }
+      response.status(error.httpCode).send(errorMsg);
+    }
+    else {
+    }
+
+  }
+  
+  // response.type('application/json');
+  // response.setHeader('Powered-By', 'NodeJS/Typescript');
+  // response.status(200).send(backboneContext.wrappedRequest);
 
 }
 
@@ -72,25 +98,20 @@ function logIncomingRequest(request: Request) {
   console.log(`Body: ${JSON.stringify(request.body)}`);
 }
 
+function sendBackResponse(response: Response, backboneContext: BackboneContext) {
 
-// import axios from 'axios';
+  const lobResponse = backboneContext.lobResponse;
+  if( lobResponse ==undefined || lobResponse == null ) {
+     throw new OAGError('Invalid lob resposne', 'SYS01', 500);
+  }
 
-// interface MyRequestBody {
-//   knownProperty: string;
-//   unknownProperty: any;
-// }
+  let statusCode = lobResponse.status;
+  let responseHeaders = lobResponse.headers;
+  let responseBody = lobResponse.data;
 
-// app.post('/backbone', async (request: Request, response: Response ) => {
-//   const body: MyRequestBody = request.body;
-  
-//   // Process knownProperty
-//   console.log(body.knownProperty);
+  Object.keys(responseHeaders).forEach((key) => {
+     response.setHeader(key, responseHeaders[key]);
+  });
 
-//   // Send unknownProperty as the body of another POST request
-//   try {
-//     const res = await axios.post('http://example.com/endpoint', body.unknownProperty);
-//     console.log(res.data);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
+  response.status(statusCode).send(responseBody);
+}
