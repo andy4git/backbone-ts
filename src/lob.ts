@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Agent } from 'https';
 import { IBackboneHandler, ILatency } from "./baseTypes";
 import { BackboneContext, LatencyRecord } from "./baseTypes";
 import { WrappedRequest } from "./baseTypes";
@@ -50,8 +51,12 @@ export class LobHandler implements IBackboneHandler, ILatency {
       });
     }
 
+    const agent = new Agent({
+      rejectUnauthorized: false // This ignores SSL certificate errors
+    });
     const axiosConfig = {
       headers,
+      httpsAgent: agent, // Use the custom agent in the Axios request
       validateStatus: function (status: any) {
         return true; 
       },
