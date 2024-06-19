@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISetup } from './baseTypes';
 import { handleDummyBackend } from './dummy';
-import { LobHandler } from './LobHandler';
+import { LobHandler } from './lobHandler';
 import { OAGError } from './errors';
 
 

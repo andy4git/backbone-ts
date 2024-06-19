@@ -7,4 +7,6 @@ oc apply -f k8s/deployment.yaml
 oc apply -f k8s/service.yaml
 oc delete route backbone
 oc apply -f k8s/route.yaml
+oc delete route dummy
+oc apply -f k8s/route2.yaml
 
