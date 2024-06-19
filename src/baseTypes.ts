@@ -18,20 +18,20 @@ export class WrappedRequest {
 
    public params: RequestParams = new RequestParams();
 
-   public stageVariables: Map<string, string> = new Map<string, string>();
+   public stageVariables: Record<string, string> = {};
 
-   public context:Map<string,string> = new Map<string,string>();  
+   public context:Record<string,string> =  {};
 
 }
 
 
 export class RequestParams {
    
-   public path: Map<string, string> = new Map<string, string>();
+   public path: Record<string, string> =  {};
 
-   public querystring: Map<string, string> = new Map<string, string>();
+   public querystring: Record<string, string> =  {};
 
-   public header: Map<string, string> = new Map<string, string>();
+   public header: Record<string, string> =  {};
 }
 
 

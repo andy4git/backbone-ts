@@ -8,8 +8,15 @@ export function handleDummyBackend(request: Request, response: Response) {
     const respBdoy: string = '{"id":"bcb71407-0485-4dd6-bc43-79cf176bff2a","issue":[{"code":"invalid","details":{"coding":[{"code":"110","display":"The structure and/or content is not valid for the following parameter: patient.identifier http://ehealthontario.ca/fhir/NamingSystem/id-pcr-eid:18585."},{"code":"110","display":"The structure and/or content is not valid for the following parameter: patient.identifier http://ehealthontario.ca/fhir/NamingSystem/id-registration-and-claims-branch-def-source:1004063796."},{"code":"HCNSuccess","display":"Successfully Processed Consent Override HCN"}],"text":"OLIS Partially Processed Consent Override"},"extension":[{"url":"http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source","valueString":"OLIS"}],"severity":"warning"}],"meta":{"profile":["http://ehealthontario.ca/fhir/StructureDefinition/ca-on-consent-pcoi-profile-OperationOutcome|1.0.0"]},"resourceType":"OperationOutcome"}';
     let lobTxid : string = uuidv4();
 
+
+    console.log(`Incoming Request: ${request.method} ${request.url}`);
+    console.log(`Headers: ${JSON.stringify(request.headers)}`);
+    console.log(`Query: ${JSON.stringify(request.query)}`);
+    console.log(`Body: ${JSON.stringify(request.body)}`);
+
+
     response.setHeader('lobTxid', lobTxid);
     response.setHeader('content-type', 'application/json');
-    response.status(201).send(respBdoy);
+    response.status(200).send(respBdoy);
 
 }

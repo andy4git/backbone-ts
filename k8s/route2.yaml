@@ -6,7 +6,7 @@ spec:
   host: dummy.apps.dev2.ecp.ehealthontario.ca
   to:
     kind: Service
-    name: backbone
+    name: dummy
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Allow

@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISetup } from './baseTypes';
 import { handleDummyBackend } from './dummy';
-import { LobHandler } from './lobHandler';
+import { LobHandler } from './lob';
 import { OAGError } from './errors';
 
 
@@ -47,13 +47,13 @@ import { OAGError } from './errors';
 
 async function handleRequest(request: Request, response: Response, backboneSetting: BackboneSetting ) {
 
-  logIncomingRequest(request);
-  
   const backboneContext: BackboneContext = deriveBackboneContext(request, backboneSetting);
   
+  logRequest(request);
+
   try {
       const lobHandler = new LobHandler();
-      lobHandler.process(backboneContext);
+      await lobHandler.process(backboneContext);
       sendBackResponse(response, backboneContext);
   }
   catch(error) {
@@ -67,7 +67,6 @@ async function handleRequest(request: Request, response: Response, backboneSetti
     }
     else {
     }
-
   }
   
   // response.type('application/json');
@@ -91,13 +90,6 @@ function deriveBackboneContext(request: Request, backboneSetting: BackboneSettin
   return backboneContext
 }
 
-function logIncomingRequest(request: Request) {
-  console.log(`Incoming Request: ${request.method} ${request.url}`);
-  console.log(`Headers: ${JSON.stringify(request.headers)}`);
-  console.log(`Query: ${JSON.stringify(request.query)}`);
-  console.log(`Body: ${JSON.stringify(request.body)}`);
-}
-
 function sendBackResponse(response: Response, backboneContext: BackboneContext) {
 
   const lobResponse = backboneContext.lobResponse;
@@ -114,4 +106,11 @@ function sendBackResponse(response: Response, backboneContext: BackboneContext) 
   });
 
   response.status(statusCode).send(responseBody);
+}
+
+function logRequest(request:Request) {
+  console.log(`Incoming Request: ${request.method} ${request.url}`);
+  console.log(`Headers: ${JSON.stringify(request.headers)}`);
+  console.log(`Query: ${JSON.stringify(request.query)}`);
+  console.log(`Body: ${JSON.stringify(request.body)}`);  
 }
