@@ -77,6 +77,7 @@ export class LobHandler implements IBackboneHandler, ILatency {
         backboneContext.lobResponse = lobResponse;
       }
       this.recordLatency(backboneContext);
+      console.log('Backend call successful, response status: ' + (backboneContext.lobResponse ? backboneContext.lobResponse.status : 'unknown'));
     }
     catch (error) {
       this.recordLatency(backboneContext);

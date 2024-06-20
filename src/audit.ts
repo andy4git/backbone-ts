@@ -3,7 +3,7 @@ import {BackboneContext, LatencyRecord} from "./baseTypes";
 
 export class AuditHandler implements IBackboneHandler, ILatency {
 
-    public process(backboneContext: BackboneContext): void {
+    public async process(backboneContext: BackboneContext) {
 
     }
 

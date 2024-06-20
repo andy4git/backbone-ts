@@ -8,6 +8,8 @@ import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISet
 import { handleDummyBackend } from './dummy';
 import { LobHandler } from './lob';
 import { OAGError } from './errors';
+import { Validator } from './validater';
+import { AuditHandler } from './audit';
 
 
 // if (cluster.isPrimary) {
@@ -52,8 +54,15 @@ async function handleRequest(request: Request, response: Response, backboneSetti
   logRequest(request);
 
   try {
+      
+      new Validator().process(backboneContext);
+
       const lobHandler = new LobHandler();
       await lobHandler.process(backboneContext);
+
+      const auditHandler = new AuditHandler();
+      await auditHandler.process(backboneContext);
+      
       sendBackResponse(response, backboneContext);
   }
   catch(error) {
@@ -66,12 +75,15 @@ async function handleRequest(request: Request, response: Response, backboneSetti
       response.status(error.httpCode).send(errorMsg);
     }
     else {
+      let errorMsg = {
+        errorCode: 'SYS02',
+        message: 'Internal server error'
+      }
+      response.status(500).send(errorMsg);      
     }
   }
-  
-  // response.type('application/json');
-  // response.setHeader('Powered-By', 'NodeJS/Typescript');
-  // response.status(200).send(backboneContext.wrappedRequest);
+
+  console.log(backboneContext.latencyRecords);
 
 }
 
@@ -84,6 +96,11 @@ function getBackBoneSetting(): BackboneSetting {
 function deriveBackboneContext(request: Request, backboneSetting: BackboneSetting): BackboneContext {
 
   let apiSetup : APISetup = new APISetup();
+  apiSetup.apiName = request.get('x-oag-apiname') || "";
+  apiSetup.requiredScope = request.get('x-oag-scope') || "";
+  apiSetup.auditRequired = request.get('x-oag-audit-enabled') === 'true' ? true : false;
+  apiSetup.ignoreAuditFailure = request.get('x-oag-audit-ignore-failure	') === 'true' ? true : false;
+  
   let wrappedRequest: WrappedRequest = request.body;
   let backboneContext: BackboneContext = new BackboneContext(apiSetup, backboneSetting, wrappedRequest);
 
