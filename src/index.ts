@@ -41,7 +41,7 @@ import { AuditHandler } from './audit';
      handleDummyBackend(request, response);
   });
 
-  app.listen(3000, () => {
+  app.listen(80, () => {
     console.log(`Server is running on port 3000 with worker ${process.pid}`);
   });
 
