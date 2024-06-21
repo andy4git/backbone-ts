@@ -16,5 +16,5 @@ spec:
         - name: backbone
           image: 872859983801.dkr.ecr.ca-central-1.amazonaws.com/oag-backbone:1.0.1
           ports:
-            - containerPort: 80
+            - containerPort: 8080
               protocol: TCP

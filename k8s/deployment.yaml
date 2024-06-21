@@ -17,5 +17,5 @@ spec:
          #image: image-registry.openshift-image-registry.svc:5000/andy-wen-test/backbone:latest
           image: image-registry.openshift-image-registry.svc:5000/andy-wen-test/backbone:latest
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
               protocol: TCP
