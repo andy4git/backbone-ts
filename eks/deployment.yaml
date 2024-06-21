@@ -8,7 +8,7 @@ spec:
     matchLabels:
       app: backbone
   template:
-    metadata:
+    metadata: 
       labels:
         app: backbone
     spec:
