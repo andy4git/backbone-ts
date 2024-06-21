@@ -64,6 +64,7 @@ async function handleRequest(request: Request, response: Response, backboneSetti
       await auditHandler.process(backboneContext);
       
       sendBackResponse(response, backboneContext);
+      
   }
   catch(error) {
     console.log(`Error occurred while processing the request: ${error}`);
