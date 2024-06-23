@@ -1,7 +1,9 @@
 import { AxiosResponse } from "axios";
+import { Agent } from 'https';
 
 export class BackboneSetting { 
-   public fmblEndPoint: string = "";
+   fmblEndPoint: string = "";
+   httpsAgent: Agent | null = null;
 }
 
 export class APISetup {

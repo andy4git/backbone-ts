@@ -10,6 +10,7 @@ import { LobHandler } from './lob';
 import { OAGError } from './errors';
 import { Validator } from './validater';
 import { AuditHandler } from './audit';
+import { getHttpsAgent } from "./utils";
 
 
 // if (cluster.isPrimary) {
@@ -26,7 +27,6 @@ import { AuditHandler } from './audit';
 // } 
 // else { 
 
-
   const app = express();
   const backboneSetting : BackboneSetting = getBackBoneSetting();
 
@@ -42,8 +42,10 @@ import { AuditHandler } from './audit';
   });
 
   app.listen(8080, () => {
-    console.log(`Server is running on port 3000 with worker ${process.pid}`);
+    console.log(`Server is running on port 8080 with worker ${process.pid}`);
   });
+
+
 
 //}
 
@@ -91,6 +93,7 @@ async function handleRequest(request: Request, response: Response, backboneSetti
 function getBackBoneSetting(): BackboneSetting {
   let backboneSetting: BackboneSetting = new BackboneSetting();
   backboneSetting.fmblEndPoint = "https://fmbl.com";
+  backboneSetting.httpsAgent = getHttpsAgent();
   return backboneSetting;
 }
 
@@ -132,3 +135,5 @@ function logRequest(request:Request) {
   console.log(`Query: ${JSON.stringify(request.query)}`);
   console.log(`Body: ${JSON.stringify(request.body)}`);  
 }
+
+

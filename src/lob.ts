@@ -56,7 +56,9 @@ export class LobHandler implements IBackboneHandler, ILatency {
     });
     const axiosConfig = {
       headers,
-      httpsAgent: agent, // Use the custom agent in the Axios request
+      // Use the custom agent in the Axios request to ignore server certificate verification      
+      httpsAgent: agent, 
+      // this validatestatus function will avoid axios throw exception when backend return 4xx or 5xx status
       validateStatus: function (status: any) {
         return true; 
       },
@@ -91,5 +93,14 @@ export class LobHandler implements IBackboneHandler, ILatency {
     let latencyRecord: LatencyRecord = new LatencyRecord(this.startTime, latency, 'LobHandler');
     backboneContext.latencyRecords.push(latencyRecord);
   }
+
+  // private getHttpsAgent(): Agent {
+
+    
+
+
+  // }
+
+
 }
 
