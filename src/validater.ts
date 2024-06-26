@@ -28,8 +28,9 @@ export class Validator implements IBackboneHandler, ILatency {
             const decodedToken : JwtPayload | null = jwt.decode(token, {json: true});
             if( decodedToken == null ) {
                 throw new OAGError('Invalid token', 'ATH02', 401);
-            }
-    
+            }    
+            backboneContext.tokenPayload = decodedToken;
+            
             const requiredScope: string = backboneContext.apiSetup.requiredScope;
             const claimedScope: any = decodedToken.scope;
             this.validateClaim(requiredScope, claimedScope, 'Invalid scope, expect ' + requiredScope + ', actual value: ' + claimedScope);

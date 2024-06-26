@@ -1,6 +1,7 @@
 
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { log } from './utils'
 
 
 export function handleDummyBackend(request: Request, response: Response) {
@@ -9,10 +10,10 @@ export function handleDummyBackend(request: Request, response: Response) {
     let lobTxid : string = uuidv4();
 
 
-    console.log(`Incoming Request: ${request.method} ${request.url}`);
-    console.log(`Headers: ${JSON.stringify(request.headers)}`);
-    console.log(`Query: ${JSON.stringify(request.query)}`);
-    console.log(`Body: ${JSON.stringify(request.body)}`);
+    log(`Incoming Request: ${request.method} ${request.url}`);
+    log(`Headers: ${JSON.stringify(request.headers)}`);
+    log(`Query: ${JSON.stringify(request.query)}`);
+    log(`Body: ${JSON.stringify(request.body)}`);
 
 
     response.setHeader('lobTxid', lobTxid);

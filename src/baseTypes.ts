@@ -1,29 +1,28 @@
 import { AxiosResponse } from "axios";
 import { Agent } from 'https';
+import { JwtPayload } from "jsonwebtoken";
+
 
 export class BackboneSetting { 
    fmblEndPoint: string = "";
    httpsAgent: Agent | null = null;
+   privateSigningKey: string = "";
 }
 
 export class APISetup {
-   public apiName: string = "";
-   public requiredScope: string = "";
-   public requiredProfile: string = "";
-   public auditRequired : boolean = false;
-   public ignoreAuditFailure : boolean = false;
+   apiName: string = "";
+   requiredScope   : string = "";
+   requiredProfile : string = "";
+   auditRequired   : boolean = false;
+   ignoreAuditFailure : boolean = false;
+   signTokenRequired  : boolean = false;
 }
 
 export class WrappedRequest {
-
-   public body: any;
-
-   public params: RequestParams = new RequestParams();
-
-   public stageVariables: Record<string, string> = {};
-
-   public context:Record<string,string> =  {};
-
+    body: any;
+    params: RequestParams = new RequestParams();
+    stageVariables: Record<string, string> = {};
+    context:Record<string,string> =  {};
 }
 
 
@@ -39,11 +38,13 @@ export class RequestParams {
 
 export class BackboneContext {
 
-   public apiSetup: APISetup ;
-   public backboneSetting: BackboneSetting;
-   public wrappedRequest: WrappedRequest ;
-   public latencyRecords: LatencyRecord[]; 
-   public lobResponse: AxiosResponse<any, any> | null = null;
+   apiSetup: APISetup ;
+   backboneSetting: BackboneSetting;
+   wrappedRequest: WrappedRequest ;
+   latencyRecords: LatencyRecord[]; 
+   lobResponse: AxiosResponse<any, any> | null = null;
+   tokenPayload : JwtPayload | null = null;
+   lobExtraHeaders : Record<string, string> = {};
 
    constructor(apiSetup: APISetup, backboneSetting: BackboneSetting, wrappedRequest: WrappedRequest) {
       this.apiSetup = apiSetup;

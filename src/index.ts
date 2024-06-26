@@ -1,7 +1,7 @@
 import cluster, { Worker } from 'cluster';
 import os from 'os';
 import express from 'express';
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import { WrappedRequest, RequestParams, BackboneSetting, BackboneContext, APISetup } from './baseTypes';
@@ -10,8 +10,8 @@ import { LobHandler } from './lob';
 import { OAGError } from './errors';
 import { Validator } from './validater';
 import { AuditHandler } from './audit';
-import { getHttpsAgent } from "./utils";
-
+import { log, logRequest, deriveBackboneContext, sendBackResponse, getBackBoneSetting } from "./utils";
+import { TokenHandler } from './token';
 
 // if (cluster.isPrimary) {
 //   // Step 2: In the master process, fork worker processes for each CPU core
@@ -21,7 +21,7 @@ import { getHttpsAgent } from "./utils";
 //   }
 
 //   cluster.on('exit', (worker : Worker) => {
-//     console.log(`Worker ${worker.process.pid} died`);
+//     log(`Worker ${worker.process.pid} died`);
 //     cluster.fork();
 //   });
 // } 
@@ -42,10 +42,8 @@ import { getHttpsAgent } from "./utils";
   });
 
   app.listen(8080, () => {
-    console.log(`Server is running on port 8080 with worker ${process.pid}`);
+    log(`Server is running on port 8080 with worker ${process.pid}`);
   });
-
-
 
 //}
 
@@ -59,17 +57,19 @@ async function handleRequest(request: Request, response: Response, backboneSetti
       
       new Validator().process(backboneContext);
 
+      const tokenHandler = new TokenHandler();
+      tokenHandler.process(backboneContext);
+
       const lobHandler = new LobHandler();
       await lobHandler.process(backboneContext);
 
       const auditHandler = new AuditHandler();
       await auditHandler.process(backboneContext);
       
-      sendBackResponse(response, backboneContext);
-      
+      sendBackResponse(response, backboneContext);      
   }
   catch(error) {
-    console.log(`Error occurred while processing the request: ${error}`);
+    log(`Error occurred while processing the request: ${error}`);
     if( error instanceof OAGError ) {
       let errorMsg = {
         errorCode: error.errorCode,
@@ -79,61 +79,13 @@ async function handleRequest(request: Request, response: Response, backboneSetti
     }
     else {
       let errorMsg = {
-        errorCode: 'SYS02',
+        errorCode: 'SYS00',
         message: 'Internal server error'
       }
       response.status(500).send(errorMsg);      
     }
   }
 
-  console.log(backboneContext.latencyRecords);
-
+  log(JSON.stringify(backboneContext.latencyRecords));
 }
-
-function getBackBoneSetting(): BackboneSetting {
-  let backboneSetting: BackboneSetting = new BackboneSetting();
-  backboneSetting.fmblEndPoint = "https://fmbl.com";
-  backboneSetting.httpsAgent = getHttpsAgent();
-  return backboneSetting;
-}
-
-function deriveBackboneContext(request: Request, backboneSetting: BackboneSetting): BackboneContext {
-
-  let apiSetup : APISetup = new APISetup();
-  apiSetup.apiName = request.get('x-oag-apiname') || "";
-  apiSetup.requiredScope = request.get('x-oag-scope') || "";
-  apiSetup.auditRequired = request.get('x-oag-audit-enabled') === 'true' ? true : false;
-  apiSetup.ignoreAuditFailure = request.get('x-oag-audit-ignore-failure	') === 'true' ? true : false;
-  
-  let wrappedRequest: WrappedRequest = request.body;
-  let backboneContext: BackboneContext = new BackboneContext(apiSetup, backboneSetting, wrappedRequest);
-
-  return backboneContext
-}
-
-function sendBackResponse(response: Response, backboneContext: BackboneContext) {
-
-  const lobResponse = backboneContext.lobResponse;
-  if( lobResponse ==undefined || lobResponse == null ) {
-     throw new OAGError('Invalid lob resposne', 'SYS01', 500);
-  }
-
-  let statusCode = lobResponse.status;
-  let responseHeaders = lobResponse.headers;
-  let responseBody = lobResponse.data;
-
-  Object.keys(responseHeaders).forEach((key) => {
-     response.setHeader(key, responseHeaders[key]);
-  });
-
-  response.status(statusCode).send(responseBody);
-}
-
-function logRequest(request:Request) {
-  console.log(`Incoming Request: ${request.method} ${request.url}`);
-  console.log(`Headers: ${JSON.stringify(request.headers)}`);
-  console.log(`Query: ${JSON.stringify(request.query)}`);
-  console.log(`Body: ${JSON.stringify(request.body)}`);  
-}
-
 

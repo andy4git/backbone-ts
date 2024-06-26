@@ -4,6 +4,7 @@ import { IBackboneHandler, ILatency } from "./baseTypes";
 import { BackboneContext, LatencyRecord } from "./baseTypes";
 import { WrappedRequest } from "./baseTypes";
 import { OAGError } from "./errors";
+import { log } from "./utils";
 
 export class LobHandler implements IBackboneHandler, ILatency {
 
@@ -42,6 +43,7 @@ export class LobHandler implements IBackboneHandler, ILatency {
     }
 
     let headers: Record<string, string> = {};
+    Object.assign(headers, backboneContext.lobExtraHeaders );
     let headerParams: Record<string, string> = wrappedRequest.params.header;
     if (Object.keys(headerParams).length > 0) {
       Object.entries(headerParams).forEach(([key, value]) => {
@@ -50,14 +52,11 @@ export class LobHandler implements IBackboneHandler, ILatency {
         }
       });
     }
-
-    const agent = new Agent({
-      rejectUnauthorized: false // This ignores SSL certificate errors
-    });
+ 
     const axiosConfig = {
       headers,
       // Use the custom agent in the Axios request to ignore server certificate verification      
-      httpsAgent: agent, 
+      httpsAgent: backboneContext.backboneSetting.httpsAgent, 
       // this validatestatus function will avoid axios throw exception when backend return 4xx or 5xx status
       validateStatus: function (status: any) {
         return true; 
@@ -65,6 +64,9 @@ export class LobHandler implements IBackboneHandler, ILatency {
     };
 
     try {
+
+      log('backbone start to call LOB at ' + endpoint );
+
       let httpMethod: string = wrappedRequest.context['http-method'] ?? '';
       if (httpMethod === 'GET') {
         const lobResponse = await axios.get(endpoint, axiosConfig );
@@ -79,11 +81,11 @@ export class LobHandler implements IBackboneHandler, ILatency {
         backboneContext.lobResponse = lobResponse;
       }
       this.recordLatency(backboneContext);
-      console.log('Backend call successful, response status: ' + (backboneContext.lobResponse ? backboneContext.lobResponse.status : 'unknown'));
+      log('Backend call successful, response status: ' + (backboneContext.lobResponse ? backboneContext.lobResponse.status : 'unknown'));
     }
     catch (error) {
       this.recordLatency(backboneContext);
-      console.log(`LobHandler: Error occurred while processing the request: ${error}`);
+      log(`LobHandler: Error occurred while processing the request: ${error}`);
       throw new OAGError('LobHandler: Error occurred while calling backend', 'SYS01', 500);
     }
   }

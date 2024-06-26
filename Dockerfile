@@ -15,7 +15,8 @@ RUN npm install
 # Copy the rest of the app source code to the working directory
 COPY ./src ./src
 COPY ./dist ./dist
-
+COPY ./misc ./misc
+COPY ./.env ./.env
 # Build the TypeScript app
 RUN npm run build
 
