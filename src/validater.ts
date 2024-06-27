@@ -11,7 +11,7 @@ export class Validator implements IBackboneHandler, ILatency {
 
     constructor() {
         this.startTime = Date.now();
-    }    
+    }
 
     public process(backboneContext: BackboneContext): void {
 
